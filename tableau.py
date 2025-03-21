@@ -1,6 +1,7 @@
-import panda as pd
-import numpy as np
-import csv
+import pandas as pd
 
-info_joueur <- csv.reader()
-with open('', newline='') as csvfile
+# Lire le fichier CSV
+df = pd.read_csv('tableaux/common_player_info.csv', delimiter=',', quotechar='|')
+
+# Afficher les premières lignes du DataFrame pour vérifier
+print(df.head())
