@@ -19,3 +19,4 @@ print(game_reg_season_22_23)
 game_reg_season_22_23["winner"] = np.where(game_reg_season_22_23["wl_home"] == "W",
                                  game_reg_season_22_23["team_abbreviation_home"],
                                  game_reg_season_22_23["team_abbreviation_away"])
+print(game_reg_season_22_23.head())
