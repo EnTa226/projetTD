@@ -3,7 +3,6 @@ import numpy as np
 
 game_info = pd.read_csv("game_info.csv", delimiter=",")
 game = pd.read_csv("game.csv", delimiter=",")
-import pandas as pd
 
 
 game["game_date"] = pd.to_datetime(game["game_date"])
