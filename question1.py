@@ -19,4 +19,5 @@ game_sorted["winner"] = np.where(game_sorted["wl_home"] == "W",
                                  game_sorted["team_name_away"])
 
 winner = game_sorted[["game_date", "winner"]].copy()
-print(f"Le gagnant de la saison 2022-2023 est {winner.iloc[0, 1]}")
+#print(f"Le gagnant de la saison 2022-2023 est {winner.iloc[0, 1]}")
+print(winner)

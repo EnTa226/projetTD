@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 #On extrait
 game = pd.read_csv('game.csv')
 game[ "game_date"] = pd.to_datetime(game["game_date"])
@@ -12,3 +13,9 @@ game_reg_season_22_23 = game[(game['game_date'] >= debut_saison_22_23 ) & (game[
                              & (game["season_type"] == "Regular Season")]
 print(game_reg_season_22_23)
 
+
+#on cherche à compter le nombre de victoires par chaque équipe
+#On crée une colonne pour le vainqueur
+game_reg_season_22_23["winner"] = np.where(game_reg_season_22_23["wl_home"] == "W",
+                                 game_reg_season_22_23["team_abbreviation_home"],
+                                 game_reg_season_22_23["team_abbreviation_away"])
