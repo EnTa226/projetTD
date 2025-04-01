@@ -1,9 +1,4 @@
 import pandas as pd
-<<<<<<< HEAD
-
-games = pd.read_csv('tableaux/games.csv')
-print(games.head())
-=======
 #On extrait
 game = pd.read_csv('game.csv')
 game[ "game_date"] = pd.to_datetime(game["game_date"])
@@ -17,4 +12,3 @@ game_reg_season_22_23 = game[(game['game_date'] >= debut_saison_22_23 ) & (game[
                              & (game["season_type"] == "Regular Season")]
 print(game_reg_season_22_23)
 
->>>>>>> 7b42bb4106badb7eebf741ea5ce7e78bb2f6056f
