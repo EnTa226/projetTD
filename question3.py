@@ -1,7 +1,7 @@
 ## question 3 Quelle est l'équipe avec le meilleur ratio de victoire sur ses matchs
 
 
-
+"""
 
 ########## Dans un premier temps avec pandas:
 
@@ -36,7 +36,7 @@ best_ratio = win_ratio.max()
 
 best_team, best_ratio
 
-
+"""
 
 
 
@@ -48,14 +48,14 @@ best_team, best_ratio
 
 # Lire le fichier CSV manuellement et traiter les données sans pandas
 
-file_path = "/mnt/data/game.csv"
+
 
 # Dictionnaires pour stocker les victoires et matchs joués
 win_counts = {}
 game_counts = {}
 
 # Ouvrir et lire le fichier ligne par ligne
-with open(file_path, "r", encoding="utf-8") as file:
+with open(game.csv, "r", encoding="utf-8") as file:
     # Lire l'en-tête pour identifier les indices des colonnes
     header = file.readline().strip().split(",")
     team_home_idx = header.index("team_name_home")
