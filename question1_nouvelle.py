@@ -2,11 +2,8 @@ import csv
 from collections import defaultdict
 from datetime import datetime
 
-# === 1. Lire le fichier CSV ===
-file_path = "game.csv"  # Assure-toi que ce fichier est dans le même dossier que ton script
-
 # On stocke uniquement les matchs de Playoffs
-with open(file_path, newline='', encoding='utf-8') as f:
+with open("game.csv", newline='', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     playoffs_games = [row for row in reader if row["season_type"] == "Playoffs"]
 
