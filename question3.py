@@ -55,7 +55,7 @@ win_counts = {}
 game_counts = {}
 
 # Ouvrir et lire le fichier ligne par ligne
-with open(game.csv, "r", encoding="utf-8") as file:
+with open("game.csv", "r", encoding="utf-8") as file:
     # Lire l'en-tête pour identifier les indices des colonnes
     header = file.readline().strip().split(",")
     team_home_idx = header.index("team_name_home")
