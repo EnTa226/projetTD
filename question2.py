@@ -19,3 +19,10 @@ print(game_reg_season_22_23)
 game_reg_season_22_23["winner"] = np.where(game_reg_season_22_23["wl_home"] == "W",
                                  game_reg_season_22_23["team_abbreviation_home"],
                                  game_reg_season_22_23["team_abbreviation_away"])
+print(game_reg_season_22_23.head())
+
+ratio = game_reg_season_22_23.groupby("winner").size() / (game_reg_season_22_23.groupby("team_abbreviation_home").size() + game_reg_season_22_23.groupby("team_abbreviation_away").size())
+print(ratio.head())
+#On trie les équipes par ratio de victoire
+ratio = ratio.sort_values(ascending=False)
+print(ratio.head())
