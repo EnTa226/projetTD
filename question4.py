@@ -1,4 +1,3 @@
-
 def lire_csv_sans_package(nom_fichier):
     with open(nom_fichier, "r", encoding="utf-8") as f:
         lignes = f.readlines()  # Lire toutes les lignes du fichier
