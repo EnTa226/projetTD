@@ -22,7 +22,25 @@ game_reg_season_22_23["winner"] = np.where(game_reg_season_22_23["wl_home"] == "
 print(game_reg_season_22_23.head())
 
 ratio = game_reg_season_22_23.groupby("winner").size() / (game_reg_season_22_23.groupby("team_abbreviation_home").size() + game_reg_season_22_23.groupby("team_abbreviation_away").size())
-print(ratio.head())
-#On trie les équipes par ratio de victoire
-ratio = ratio.sort_values(ascending=False)
-print(ratio.head())
+
+# Convertir le résultat en DataFrame
+ratio_df = ratio.reset_index()
+
+# Renommer les colonnes pour plus de clarté
+ratio_df.columns = ['abbreviation', 'Win Ratio']
+
+
+
+
+# Charger le fichier teams_conferences.csv
+teams_conferences = pd.read_csv('teams_conferences.csv', sep = ';')
+
+# Joindre les deux DataFrames sur les colonnes 'winner' et 'abbreviation'
+ratio_df = pd.merge(ratio_df, teams_conferences, on = 'abbreviation')
+
+# Afficher le résultat
+print(ratio_df.head())
+
+
+ratio_df = ratio_df.sort_values(descending=True)
+print(ratio_df.head())
