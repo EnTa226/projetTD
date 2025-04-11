@@ -64,8 +64,9 @@ with open("common_player_info.csv", newline='', encoding='utf-8') as csvfile:
                     heights_by_position2[position2] = []
                 heights_by_position2[position2].append(height_cm2)
 # Afficher les résultats
+print("Taille des No1 de draft (en cm) par poste :")
 for position, heights in heights_by_position.items():
     print(f"{position} : {mean(heights)}")
-
+print("Taille des No30 de draft (en cm) par poste :")
 for position, heights in heights_by_position2.items():
     print(f"{position} : {mean(heights)}")
