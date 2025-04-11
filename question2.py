@@ -30,8 +30,6 @@ ratio_df = ratio.reset_index()
 ratio_df.columns = ['abbreviation', 'Win Ratio']
 
 
-
-
 # Charger le fichier teams_conferences.csv
 teams_conferences = pd.read_csv('teams_conferences.csv', sep = ';')
 
@@ -41,19 +39,23 @@ ratio_df = pd.merge(ratio_df, teams_conferences, on = 'abbreviation')
 # Afficher le résultat
 print(ratio_df.head())
 
+ratio_df = ratio_df.sort_values(ascending=False, by = 'Win Ratio')
 
-ratio_df = ratio_df.sort_values('Win Ratio', ascending=False)
-print(ratio_df.head())
 
 #classement conférence ouest
-classement_west = ratio_df[ratio_df['conf'] == 'W']
-print(classement_west.head())
+classement_west = ratio_df[ratio_df['conf'] == 'W'].copy()
+
+# Ajouter la colonne 'classement' en utilisant .loc
+classement_west.loc[:, 'classement'] = classement_west['Win Ratio'].rank(ascending=False, method='first').astype(int)
+print(classement_west.to_string(index=False))
 
 #classement conférence est
-classement_east = ratio_df[ratio_df['conf'] == 'E']
-print(classement_east.head())
+# Filtrer le DataFrame pour la conférence Est
+classement_east = ratio_df[ratio_df['conf'] == 'E'].copy()
 
-#donner les resultats en csv
-classement_west.to_csv('classement_west.csv', index=False)
-classement_east.to_csv('classement_east.csv', index=False)
+# Ajouter la colonne 'classement' en utilisant .loc
+classement_east.loc[:, 'classement'] = classement_east['Win Ratio'].rank(ascending=False, method='first').astype(int)
+
+print(classement_east.to_string(index=False))
+
 
