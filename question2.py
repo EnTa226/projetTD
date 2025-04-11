@@ -42,5 +42,18 @@ ratio_df = pd.merge(ratio_df, teams_conferences, on = 'abbreviation')
 print(ratio_df.head())
 
 
-ratio_df = ratio_df.sort_values(descending=True)
+ratio_df = ratio_df.sort_values('Win Ratio', ascending=False)
 print(ratio_df.head())
+
+#classement conférence ouest
+classement_west = ratio_df[ratio_df['conf'] == 'W']
+print(classement_west.head())
+
+#classement conférence est
+classement_east = ratio_df[ratio_df['conf'] == 'E']
+print(classement_east.head())
+
+#donner les resultats en csv
+classement_west.to_csv('classement_west.csv', index=False)
+classement_east.to_csv('classement_east.csv', index=False)
+
