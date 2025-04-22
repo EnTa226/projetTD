@@ -1,28 +1,4 @@
 import csv
-"""
-# Dictionnaire pour stocker les poids par poste
-weights_by_position = {}
-
-with open("common_player_info.csv", newline='', encoding='utf-8') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        if row.get("draft_number") == "1":
-            position = row.get("position")
-            weight_str = row.get("weight")
-            if position and weight_str:
-                try:
-                    weight = float(weight_str)
-                except ValueError:
-                    continue
-
-                if position not in weights_by_position:
-                    weights_by_position[position] = []
-                weights_by_position[position].append(weight)
-
-# Afficher les résultats
-for position, weights in weights_by_position.items():
-    print(f"{position} : {weights}")"""
-
 def mean(l):
     a= 0
     for i in l:
