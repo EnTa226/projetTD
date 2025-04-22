@@ -1,23 +1,20 @@
-import csv
-from collections import defaultdict
+import pandas as pd
 
-# Dictionnaire pour stocker les équipes par joueur
-player_teams = defaultdict(set)
+# Charger le fichier CSV
+df = pd.read_csv("common_player_info.csv")
 
-# Lecture du fichier CSV
-with open("common_player_info.csv", newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        player_name = row["player_name"]
-        team_name = row["team_name"]
+# Convertir la colonne 'jersey' en chaîne de caractères pour utiliser str.isnumeric()
+df['jersey'] = df['jersey'].astype(str)
 
-        if team_name:  # éviter les lignes vides
-            player_teams[player_name].add(team_name)
+# Filtrer uniquement les valeurs non nulles et numériques
+df = df[df['jersey'].str.isnumeric()]
 
-# Trouver le joueur avec le plus d'équipes
-most_teams_player = max(player_teams.items(), key=lambda x: len(x[1]))
-most_teams_name = most_teams_player[0]
-most_teams_count = len(most_teams_player[1])
+# Convertir les numéros de maillot en entiers
+df['jersey'] = df['jersey'].astype(int)
 
-# Résultat
-print(f"Le joueur ayant joué pour le plus d'équipes est {most_teams_name} avec {most_teams_count} équipes différentes.")
+# Compter les occurrences de chaque numéro
+top_jerseys = df['jersey'].value_counts().sort_values(ascending=False)
+
+# Afficher les numéros les plus utilisés
+print("Numéros de maillot les plus utilisés par les joueurs :")
+print(top_jerseys.head(10))
