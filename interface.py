@@ -390,6 +390,97 @@ top_jerseys = df['jersey'].value_counts().sort_values(ascending=False)
 print("Numéros de maillot les plus utilisés par les joueurs :")
 print(top_jerseys.head(1))
 """
+def run_question_10_pure(output_widget):
+    try:
+        team_points = {}
+        with open("other_stats.csv", "r", encoding="utf-8") as f:
+            next(f)  # Sauter l'en-tête
+            for line in f:
+                data = line.strip().split(",")
+                team_home = data[3]
+                team_away = data[16]
+                pts_home = int(data[5]) + int(data[6]) + int(data[7])
+                pts_away = int(data[18]) + int(data[19]) + int(data[20])
+                team_points[team_home] = team_points.get(team_home, 0) + pts_home
+                team_points[team_away] = team_points.get(team_away, 0) + pts_away
+
+        top_team = max(team_points, key=team_points.get)
+        top_points = team_points[top_team]
+        result = f"L'équipe avec le plus de points cumulés est {top_team} avec {top_points} points."
+
+        output_widget.config(state="normal")
+        output_widget.delete("1.0", tk.END)
+        output_widget.insert(tk.END, result)
+        output_widget.config(state="disabled")
+    except Exception as e:
+        output_widget.config(state="normal")
+        output_widget.delete("1.0", tk.END)
+        output_widget.insert(tk.END, f"Erreur : {e}")
+        output_widget.config(state="disabled")
+
+
+def run_question_10_pandas(output_widget):
+    try:
+        import pandas as pd
+        df = pd.read_csv("other_stats.csv")
+        df["pts_home_total"] = df.iloc[:, 5] + df.iloc[:, 6] + df.iloc[:, 7]
+        df["pts_away_total"] = df.iloc[:, 18] + df.iloc[:, 19] + df.iloc[:, 20]
+
+        points_home = df.groupby(df.columns[3])["pts_home_total"].sum()
+        points_away = df.groupby(df.columns[16])["pts_away_total"].sum()
+
+        total_points = points_home.add(points_away, fill_value=0)
+
+        top_team = total_points.idxmax()
+        top_points = int(total_points.max())
+        result = f"L'équipe avec le plus de points cumulés est {top_team} avec {top_points} points."
+
+        output_widget.config(state="normal")
+        output_widget.delete("1.0", tk.END)
+        output_widget.insert(tk.END, result)
+        output_widget.config(state="disabled")
+    except Exception as e:
+        output_widget.config(state="normal")
+        output_widget.delete("1.0", tk.END)
+        output_widget.insert(tk.END, f"Erreur : {e}")
+        output_widget.config(state="disabled")
+
+code_q10_pure = '''team_points = {}
+
+with open("other_stats.csv", "r", encoding="utf-8") as f:
+    next(f)
+    for line in f:
+        data = line.strip().split(",")
+        team_home = data[3]
+        team_away = data[16]
+        pts_home = int(data[5]) + int(data[6]) + int(data[7])
+        pts_away = int(data[18]) + int(data[19]) + int(data[20])
+        team_points[team_home] = team_points.get(team_home, 0) + pts_home
+        team_points[team_away] = team_points.get(team_away, 0) + pts_away
+
+top_team = max(team_points, key=team_points.get)
+top_points = team_points[top_team]
+
+print(f"L'équipe avec le plus de points cumulés est {top_team} avec {top_points} points.")
+'''
+
+code_q10_pandas = '''import pandas as pd
+
+df = pd.read_csv("other_stats.csv")
+df["pts_home_total"] = df.iloc[:, 5] + df.iloc[:, 6] + df.iloc[:, 7]
+df["pts_away_total"] = df.iloc[:, 18] + df.iloc[:, 19] + df.iloc[:, 20]
+
+points_home = df.groupby(df.columns[3])["pts_home_total"].sum()
+points_away = df.groupby(df.columns[16])["pts_away_total"].sum()
+
+total_points = points_home.add(points_away, fill_value=0)
+
+top_team = total_points.idxmax()
+top_points = int(total_points.max())
+
+print(f"L'équipe avec le plus de points cumulés est {top_team} avec {top_points} points.")
+'''
+
 
 
 # === FENÊTRE QUESTION DÉDIÉE ===
@@ -465,6 +556,21 @@ def main_menu():
                   command=lambda: open_question_window("Question 9", code_question_9, run_question_9)
                   ).pack(pady=5)
             
+        elif i == 10:
+            tk.Button(root,
+                 text="Question 10 - Python pur",
+                 font=("Helvetica", 13),
+                 width=30,
+                 command=lambda: open_question_window("Question 10 - Python pur", code_q10_pure, run_question_10_pure)
+                 ).pack(pady=3)
+
+            tk.Button(root,
+                 text="Question 10 - Pandas",
+                 font=("Helvetica", 13),
+                 width=30,
+                 command=lambda: open_question_window("Question 10 - Pandas", code_q10_pandas, run_question_10_pandas)
+                 ).pack(pady=3)
+
         else:
             tk.Button(root,
                   text=f"Question {i} (à compléter)",
