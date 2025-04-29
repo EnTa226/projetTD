@@ -3,30 +3,31 @@ import pandas as pd
 # Charger les données
 game = pd.read_csv('game.csv', sep=',')
 
-# Convertir la colonne season_id en chaîne de caractères si nécessaire
+# Convertir la colonne season_id en chaîne de caractères
 game['season_id'] = game['season_id'].astype(str)
 
-# Filtrer les données pour la saison 2005
-game2005 = game[game["season_id"] == "22005"]
+# Déterminer l'année qui nous intéresse
+annee = input("Entrez l'année de la saison (ex: 2005) : ")
 
-# Vérifier si game2005 contient des données
-if game2005.empty:
-    print("Aucune donnée trouvée pour la saison 22005.")
+# Filtrer les données pour l'année spécifiée
+game_annee = game[game["season_id"].str.contains(annee)]
+if game_annee.empty:
+    print(f"Aucune donnée trouvée pour la saison {annee}.")
 else:
     # Compter le nombre de matchs pour chaque équipe à domicile
-    home_counts = game2005['team_abbreviation_home'].value_counts()
+    home_counts = game_annee['team_abbreviation_home'].value_counts()
 
     # Compter le nombre de matchs pour chaque équipe à l'extérieur
-    away_counts = game2005['team_abbreviation_away'].value_counts()
+    away_counts = game_annee['team_abbreviation_away'].value_counts()
 
     # Additionner les comptages pour obtenir le nombre total de matchs pour chaque équipe
     total_counts = home_counts.add(away_counts, fill_value=0)
 
     # Calculer la somme des pourcentages de réussite à trois points pour chaque équipe à domicile
-    home_fg3_pct = game2005.groupby('team_abbreviation_home')['fg3_pct_home'].sum()
+    home_fg3_pct = game_annee.groupby('team_abbreviation_home')['fg3_pct_home'].sum()
 
     # Calculer la somme des pourcentages de réussite à trois points pour chaque équipe à l'extérieur
-    away_fg3_pct = game2005.groupby('team_abbreviation_away')['fg3_pct_away'].sum()
+    away_fg3_pct = game_annee.groupby('team_abbreviation_away')['fg3_pct_away'].sum()
 
     # Additionner les sommes des pourcentages de réussite à trois points
     total_fg3_pct = home_fg3_pct.add(away_fg3_pct, fill_value=0)
@@ -43,7 +44,19 @@ else:
 
     # Réinitialiser l'index pour qu'il soit dans l'ordre
     reussite_3_df_sorted = reussite_3_df_sorted.reset_index(drop=True)
+    
 
     print(reussite_3_df_sorted)
+    
+    # Charger les données à partir du fichier CSV
+    team_csv = pd.read_csv('team.csv')
 
+    # Créer un dictionnaire pour mapper les abréviations aux noms complets
+    team_dict = team_csv.set_index('abbreviation')['full_name'].to_dict()
 
+    # Fonction pour obtenir le nom complet de l'équipe à partir de son abréviation
+    def get_full_name(abbreviation):
+        return team_dict.get(abbreviation, "Équipe non trouvée")
+
+    print(f"L'équipe avec le plus de réussite aux trois points sont les {get_full_name(reussite_3_df_sorted.iloc[0]['team_abbreviation'])} "
+        f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}.")
