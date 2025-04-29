@@ -2,17 +2,21 @@ import pandas as pd
 
 # Charger les données
 game = pd.read_csv('game.csv', sep=',')
+game = game.dropna(subset=['fg3_pct_home', 'fg3_pct_away'])
+
+print(game.head())
 
 # Convertir la colonne season_id en chaîne de caractères
 game['season_id'] = game['season_id'].astype(str)
 
 # Déterminer l'année qui nous intéresse
-annee = input("Entrez l'année de la saison (ex: 2005) : ")
+annee = input("Entrez l'année de la saison à partir de 1979 (ex: 2005) : ")
 
 # Filtrer les données pour l'année spécifiée
 game_annee = game[game["season_id"].str.contains(annee)]
 if game_annee.empty:
-    print(f"Aucune donnée trouvée pour la saison {annee}.")
+    print(f"Aucune donnée trouvée pour la saison {annee},"
+          f" surement parce que la NBA ne documentait toujours pas la réussite aux trois points")
 else:
     # Compter le nombre de matchs pour chaque équipe à domicile
     home_counts = game_annee['team_abbreviation_home'].value_counts()
