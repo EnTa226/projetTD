@@ -1,21 +1,20 @@
-import csv
+import pandas as pd
 from collections import defaultdict
 from datetime import datetime
 
-# On stocke uniquement les matchs de Playoffs
-with open("game.csv", newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    playoffs_games = [row for row in reader if row["season_type"] == "Playoffs"]
+# === 1. Charger le fichier CSV avec pandas et filtrer les Playoffs ===
+df = pd.read_csv("game.csv")
+playoffs_df = df[df["season_type"] == "Playoffs"]
 
 # === 2. Grouper les matchs par saison ===
 seasons = defaultdict(list)
-for row in playoffs_games:
+for _, row in playoffs_df.iterrows():
     seasons[row["season_id"]].append(row)
 
 # === 3. Trouver le dernier match de chaque saison ===
 champions = []
 for season_id, matches in seasons.items():
-    # Trier les matchs par date (format avec heure incluse)
+    # Trier les matchs par date
     matches.sort(key=lambda x: datetime.strptime(x["game_date"], "%Y-%m-%d %H:%M:%S"))
     last_game = matches[-1]
 
