@@ -1,54 +1,28 @@
+import pandas as pd
 
-# Lecture manuelle du fichier
-with open("common_player_info.csv", encoding="utf-8") as f:
-    lines = f.readlines()
-
-# Extraction de l'en-tête (colonnes)
-headers = lines[0].strip().split(",")
-data = []
-
-# Parse ligne par ligne
-for line in lines[1:]:
-    values = line.strip().split(",")
-    
-    # Gérer les valeurs contenant des virgules entre guillemets
-    while len(values) > len(headers):
-        for i in range(len(values) - 1):
-            if values[i].startswith('"') and not values[i].endswith('"'):
-                values[i] = values[i] + "," + values.pop(i + 1)
-                break
-
-    # Crée un dictionnaire pour chaque joueur
-    player = {headers[i]: values[i].strip('"') if i < len(values) else "" for i in range(len(headers))}
-    data.append(player)
-
-# Nettoyage des données
-for player in data:
+def convert_height_to_cm(height_str):
     try:
-        player["draft_number"] = int(player["draft_number"])
-    except:
-        player["draft_number"] = None
+        feet, inches = map(int, height_str.split("-"))
+        return round(feet * 30.48 + inches * 2.54, 2)
+    except (ValueError, AttributeError):
+        return None
 
-    player["height_cm"] = convert_height_to_cm(player.get("height", ""))
+df = pd.read_csv("common_player_info.csv")
 
-# Fonction pour calculer la moyenne par position
-def mean_height_by_position(players, draft_target):
-    position_totals = {}
-    position_counts = {}
+# Nettoyage / conversion
+df["draft_number"] = pd.to_numeric(df["draft_number"], errors="coerce")
+df["height_cm"] = df["height"].apply(convert_height_to_cm)
 
-    for p in players:
-        if p["draft_number"] == draft_target and p["height_cm"] is not None:
-            pos = p["position"]
-            position_totals[pos] = position_totals.get(pos, 0) + p["height_cm"]
-            position_counts[pos] = position_counts.get(pos, 0) + 1
+# Filtrage et groupement
+draft_1 = df[df["draft_number"] == 1]
+mean_heights_1 = draft_1.groupby("position")["height_cm"].mean()
 
-    return {pos: round(position_totals[pos] / position_counts[pos], 2) for pos in position_totals}
+draft_30 = df[df["draft_number"] == 30]
+mean_heights_30 = draft_30.groupby("position")["height_cm"].mean()
 
 # Affichage
 print("Taille des No1 de draft (en cm) par poste :")
-for pos, avg in mean_height_by_position(data, 1).items():
-    print(f"{pos}: {avg} cm")
+print(mean_heights_1)
 
 print("\nTaille des No30 de draft (en cm) par poste :")
-for pos, avg in mean_height_by_position(data, 30).items():
-    print(f"{pos}: {avg} cm")
+print(mean_heights_30)
