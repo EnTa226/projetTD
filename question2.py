@@ -21,7 +21,8 @@ game_reg_season_22_23["winner"] = np.where(game_reg_season_22_23["wl_home"] == "
                                  game_reg_season_22_23["team_abbreviation_away"])
 print(game_reg_season_22_23.head())
 
-ratio = game_reg_season_22_23.groupby("winner").size() / (game_reg_season_22_23.groupby("team_abbreviation_home").size() + game_reg_season_22_23.groupby("team_abbreviation_away").size())
+ratio = game_reg_season_22_23.groupby("winner").size() / (game_reg_season_22_23.groupby("team_abbreviation_home").size() +
+                                                          game_reg_season_22_23.groupby("team_abbreviation_away").size())
 
 # Convertir le résultat en DataFrame
 ratio_df = ratio.reset_index()
