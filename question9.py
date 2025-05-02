@@ -16,5 +16,5 @@ df['jersey'] = df['jersey'].astype(int)
 top_jerseys = df['jersey'].value_counts().sort_values(ascending=False)
 
 # Afficher les numéros les plus utilisés
-print("Numéros de maillot les plus utilisés par les joueurs :")
+print("Le numéro de maillot le plus utilisé par les joueurs :")
 print(top_jerseys.head(1))
