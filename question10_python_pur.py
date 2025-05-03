@@ -28,6 +28,7 @@ top_points = team_points[top_team]
 # Afficher le résultat
 print(f"L'équipe avec le plus de points cumulés est {top_team} avec {top_points} points.")
 
+
 #pd : 
 
 import pandas as pd
