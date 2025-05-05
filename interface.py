@@ -3,6 +3,7 @@ from tkinter import scrolledtext
 from collections import defaultdict
 from datetime import datetime
 import csv
+import inspect
 
 # === FONCTIONS DE QUESTION ===
 
@@ -267,6 +268,267 @@ def run_question_3_part2(output_widget):
         output_widget.delete("1.0", tk.END)
         output_widget.insert(tk.END, f"Erreur : {e}")
         output_widget.config(state="disabled")
+
+
+
+code_q4 = """import pandas as pd
+
+# Charger les données
+game = pd.read_csv('game.csv', sep=',')
+game = game.dropna(subset=['fg3_pct_home', 'fg3_pct_away'])
+game['season_id'] = game['season_id'].astype(str)
+
+# Filtrer les données pour une année
+game_annee = game[game["season_id"].str.contains(annee)]
+if game_annee.empty:
+    print(f"Aucune donnée trouvée pour la saison {annee}")
+else:
+    home_counts = game_annee['team_abbreviation_home'].value_counts()
+    away_counts = game_annee['team_abbreviation_away'].value_counts()
+    total_counts = home_counts.add(away_counts, fill_value=0)
+    home_fg3_pct = game_annee.groupby('team_abbreviation_home')['fg3_pct_home'].sum()
+    away_fg3_pct = game_annee.groupby('team_abbreviation_away')['fg3_pct_away'].sum()
+    total_fg3_pct = home_fg3_pct.add(away_fg3_pct, fill_value=0)
+    reussite_3 = total_fg3_pct / total_counts
+    reussite_3_df = reussite_3.reset_index()
+    reussite_3_df.columns = ['team_abbreviation', 'reussite_3']
+    reussite_3_df_sorted = reussite_3_df.sort_values(by='reussite_3', ascending=False).reset_index(drop=True)
+
+    team_csv = pd.read_csv('team.csv')
+    team_dict = team_csv.set_index('abbreviation')['full_name'].to_dict()
+
+    def get_full_name(abbreviation):
+        return team_dict.get(abbreviation, "Équipe non trouvée")
+
+    print(f"L'équipe avec le plus de réussite à 3 pts est {get_full_name(reussite_3_df_sorted.iloc[0]['team_abbreviation'])} "
+          f"avec {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}.")
+"""
+def run_question_4(annee):
+    import pandas as pd
+
+    game = pd.read_csv('game.csv', sep=',')
+    game = game.dropna(subset=['fg3_pct_home', 'fg3_pct_away'])
+    game['season_id'] = game['season_id'].astype(str)
+    game_annee = game[game["season_id"].str.contains(annee)]
+
+    if game_annee.empty:
+        return f"Aucune donnée trouvée pour la saison {annee}"
+
+    home_counts = game_annee['team_abbreviation_home'].value_counts()
+    away_counts = game_annee['team_abbreviation_away'].value_counts()
+    total_counts = home_counts.add(away_counts, fill_value=0)
+    home_fg3_pct = game_annee.groupby('team_abbreviation_home')['fg3_pct_home'].sum()
+    away_fg3_pct = game_annee.groupby('team_abbreviation_away')['fg3_pct_away'].sum()
+    total_fg3_pct = home_fg3_pct.add(away_fg3_pct, fill_value=0)
+    reussite_3 = total_fg3_pct / total_counts
+    reussite_3_df = reussite_3.reset_index()
+    reussite_3_df.columns = ['team_abbreviation', 'reussite_3']
+    reussite_3_df_sorted = reussite_3_df.sort_values(by='reussite_3', ascending=False).reset_index(drop=True)
+
+    team_csv = pd.read_csv('team.csv')
+    team_dict = team_csv.set_index('abbreviation')['full_name'].to_dict()
+
+    def get_full_name(abbreviation):
+        return team_dict.get(abbreviation, "Équipe non trouvée")
+
+    result = f"L'équipe avec le plus de réussite à 3 pts est {get_full_name(reussite_3_df_sorted.iloc[0]['team_abbreviation'])} avec {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}."
+    return result
+
+# Question 5 : équipe avec le plus de matchs gagnés par saison
+
+code_question_5 = '''
+# Compter les victoires par équipe dans une saison donnée
+import pandas as pd
+
+game = pd.read_csv('game.csv')
+game['season_id'] = game['season_id'].astype(str)
+
+annee = input("Entrez l'année de la saison (ex: 2005) : ")
+games = game[game["season_id"].str.contains(annee)]
+
+# Compter les victoires
+home_wins = games[games["pts_home"] > games["pts_away"]]["team_abbreviation_home"].value_counts()
+away_wins = games[games["pts_home"] < games["pts_away"]]["team_abbreviation_away"].value_counts()
+total_wins = home_wins.add(away_wins, fill_value=0)
+
+# Obtenir l'équipe avec le plus de victoires
+max_team = total_wins.idxmax()
+max_wins = total_wins[max_team]
+
+print(f"L'équipe avec le plus de victoires est {max_team} avec {int(max_wins)} victoires.")
+'''
+
+def run_question_5(annee):
+    import pandas as pd
+
+    try:
+        game = pd.read_csv("game.csv")
+        game['season_id'] = game['season_id'].astype(str)
+        games = game[game["season_id"].str.contains(annee)]
+
+        if games.empty:
+            return f"Aucune donnée trouvée pour la saison {annee}."
+
+        home_wins = games[games["pts_home"] > games["pts_away"]]["team_abbreviation_home"].value_counts()
+        away_wins = games[games["pts_home"] < games["pts_away"]]["team_abbreviation_away"].value_counts()
+        total_wins = home_wins.add(away_wins, fill_value=0)
+
+        max_team = total_wins.idxmax()
+        max_wins = int(total_wins[max_team])
+
+        return f"L'équipe avec le plus de victoires est {max_team} avec {max_wins} victoires."
+
+    except Exception as e:
+        return f"Erreur : {e}"
+
+
+code_question_7 = '''
+# Boxplot des tailles de joueurs par poste
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def convert_height_to_cm(height_str):
+    try:
+        feet, inches = map(int, height_str.split("-"))
+        return round(feet * 30.48 + inches * 2.54, 2)
+    except:
+        return None
+
+df = pd.read_csv("common_player_info.csv")
+df["height_cm"] = df["height"].apply(convert_height_to_cm)
+df_clean = df.dropna(subset=["height_cm", "position"])
+
+plt.figure(figsize=(10, 6))
+df_clean.boxplot(column="height_cm", by="position")
+plt.title("Répartition des tailles (en cm) des joueurs par poste")
+plt.suptitle("")
+plt.xlabel("Poste")
+plt.ylabel("Taille (cm)")
+plt.xticks(rotation=45)
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+'''
+
+def run_question_7():
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    def convert_height_to_cm(height_str):
+        try:
+            feet, inches = map(int, height_str.split("-"))
+            return round(feet * 30.48 + inches * 2.54, 2)
+        except:
+            return None
+
+    try:
+        df = pd.read_csv("common_player_info.csv")
+        df["height_cm"] = df["height"].apply(convert_height_to_cm)
+        df_clean = df.dropna(subset=["height_cm", "position"])
+
+        if df_clean.empty:
+            return "Aucune donnée exploitable (vérifiez la colonne 'height' ou 'position')."
+
+        plt.figure(figsize=(10, 6))
+        df_clean.boxplot(column="height_cm", by="position")
+        plt.title("Répartition des tailles (en cm) des joueurs par poste")
+        plt.suptitle("")
+        plt.xlabel("Poste")
+        plt.ylabel("Taille (cm)")
+        plt.xticks(rotation=45)
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+        return "Boxplot affiché avec succès."
+
+    except Exception as e:
+        return f"Erreur : {e}"
+
+code_question_8 = '''
+# Analyser l'évolution de la proportion de joueurs étrangers draftés depuis 1984
+import pandas as pd
+import matplotlib.pyplot as plt
+
+draft = pd.read_csv('draft_history.csv')
+draft = draft[draft['season'] >= 1984]
+draft = draft.dropna(subset=['organization'])
+
+annual_counts = draft.groupby('season').size()
+annual_counts_df = annual_counts.reset_index(name='count')
+
+draft_stranger = draft[
+    (draft['organization_type'] == 'Other Team/Club') &
+    (draft['organization'].str.contains(r'\\(')) &
+    (~draft['organization'].str.contains('IBL')) &
+    (~draft['organization'].str.contains('G League'))
+]
+
+strangers_annual_counts = draft_stranger.groupby('season').size()
+strangers_annual_counts_df = strangers_annual_counts.reset_index(name='count')
+
+merged_df = pd.merge(annual_counts_df, strangers_annual_counts_df, on='season', how='left', suffixes=('_total', '_stranger'))
+merged_df['ratio'] = (merged_df['count_stranger'] / merged_df['count_total']) * 100
+
+plt.figure(figsize=(12, 8))
+plt.bar(merged_df['season'], merged_df['ratio'], color='skyblue')
+plt.title('Proportion de joueurs étrangers draftés par année')
+plt.xlabel('Année')
+plt.ylabel('Part de joueurs étrangers (%)')
+plt.grid(True)
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+'''
+
+def run_question_8():
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    try:
+        draft = pd.read_csv('draft_history.csv')
+        draft = draft[draft['season'] >= 1984]
+        draft = draft.dropna(subset=['organization'])
+
+        annual_counts = draft.groupby('season').size()
+        annual_counts_df = annual_counts.reset_index(name='count')
+
+        draft_stranger = draft[
+            (draft['organization_type'] == 'Other Team/Club') &
+            (draft['organization'].str.contains(r'\(')) &
+            (~draft['organization'].str.contains('IBL')) &
+            (~draft['organization'].str.contains('G League'))
+        ]
+
+        strangers_annual_counts = draft_stranger.groupby('season').size()
+        strangers_annual_counts_df = strangers_annual_counts.reset_index(name='count')
+
+        merged_df = pd.merge(
+            annual_counts_df, 
+            strangers_annual_counts_df, 
+            on='season', 
+            how='left', 
+            suffixes=('_total', '_stranger')
+        )
+
+        merged_df['ratio'] = (merged_df['count_stranger'] / merged_df['count_total']) * 100
+
+        plt.figure(figsize=(12, 8))
+        plt.bar(merged_df['season'], merged_df['ratio'], color='skyblue')
+        plt.title('Proportion de joueurs étrangers draftés par année')
+        plt.xlabel('Année')
+        plt.ylabel('Part de joueurs étrangers (%)')
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
+
+        return "Graphique affiché avec succès."
+
+    except Exception as e:
+        return f"Erreur : {e}"
+
+
 code_q10_part1 = """# Version sans filtre (inclut Barcelone FC)
 # Dictionnaires pour stocker les victoires et matchs joués
 win_counts = {}
@@ -485,25 +747,56 @@ print(f"L'équipe avec le plus de points cumulés est {top_team} avec {top_point
 
 # === FENÊTRE QUESTION DÉDIÉE ===
 
-def open_question_window(title, code_str, run_function):
-    question_win = tk.Toplevel()
-    question_win.title(title)
-    question_win.geometry("1200x900")
+def open_window(titre, fonction, code, besoin_annee=False):
+    win = tk.Toplevel()
+    win.title(titre)
+    win.geometry("700x600")
 
-    tk.Label(question_win, text=title, font=("Helvetica", 20, "bold")).pack(pady=10)
+    # --- Affichage du code source ---
+    tk.Label(win, text="Code de la question :", font=("Arial", 12, "bold")).pack(pady=5)
+    text_code = scrolledtext.ScrolledText(win, height=15, wrap="word")
+    text_code.insert(tk.END, code)
+    text_code.configure(state="disabled")
+    text_code.pack(fill="both", expand=True, padx=10)
 
-    code_area = scrolledtext.ScrolledText(question_win, width=140, height=30, font=("Courier", 10), bg="#f0f0f0")
-    code_area.insert(tk.END, code_str)
-    code_area.config(state="disabled")
-    code_area.pack(padx=10, pady=5)
+    # --- Zone de résultat ---
+    tk.Label(win, text="Résultat :", font=("Arial", 12, "bold")).pack(pady=5)
+    result_text = scrolledtext.ScrolledText(win, height=8, wrap="word")
+    result_text.configure(state="disabled")
+    result_text.pack(fill="both", expand=False, padx=10)
 
-    output_area = scrolledtext.ScrolledText(question_win, width=140, height=12, font=("Courier", 10), bg="#eaffea")
-    output_area.insert(tk.END, "Résultat ici...")
-    output_area.config(state="disabled")
-    output_area.pack(padx=10, pady=10)
+    # --- Helpers internes ---
+    def run_with_arg():
+        annee = entry.get()
+        res = fonction(annee)
+        result_text.configure(state="normal")
+        result_text.delete("1.0", tk.END)
+        result_text.insert(tk.END, res)
+        result_text.configure(state="disabled")
 
-    tk.Button(question_win, text="Exécuter le code", font=("Helvetica", 12),
-              command=lambda: run_function(output_area)).pack(pady=10)
+    def run_direct():
+        result_text.configure(state="normal")
+        result_text.delete("1.0", tk.END)
+        sig = inspect.signature(fonction)
+        # si la fonction attend 1 paramètre, on lui passe le widget
+        if len(sig.parameters) == 1:
+            fonction(result_text)
+        else:
+            # sinon on récupère son retour (texte ou "")
+            res = fonction()
+            if res is not None:
+                result_text.insert(tk.END, res)
+        result_text.configure(state="disabled")
+
+    # --- Choix d'exécution selon qu'on doive saisir une année ---
+    if besoin_annee:
+        tk.Label(win, text="Entrez une année (ex: 2005) :").pack(pady=5)
+        entry = tk.Entry(win)
+        entry.pack(pady=5)
+        btn = tk.Button(win, text="Exécuter", command=run_with_arg)
+    else:
+        btn = tk.Button(win, text="Exécuter", command=run_direct)
+    btn.pack(pady=10)
 
 # === FENÊTRE PRINCIPALE AVEC LE HUB ===
 
@@ -512,74 +805,46 @@ def main_menu():
     root.title("Hub d'analyse NBA 🏀")
     root.geometry("600x700")
 
-    tk.Label(root, text="Ici ca répond", font=("Helvetica", 22, "bold")).pack(pady=20)
+    tk.Label(root, text="Ici ça répond", font=("Helvetica", 22, "bold")).pack(pady=20)
     tk.Label(root, text="Choisis une question à explorer :", font=("Helvetica", 14)).pack(pady=10)
 
-    for i in range(1, 11):
-        if i == 1:
-            tk.Button(root,
-                  text=f"Question {i}",
-                  font=("Helvetica", 13),
-                  width=30,
-                  command=lambda: open_question_window("Question 1", code_question_1, run_question_1)
-                  ).pack(pady=5)
-        elif i == 2:
-            tk.Button(root,
-                  text=f"Question {i}",
-                  font=("Helvetica", 13),
-                  width=30,
-                  command=lambda: open_question_window("Question 2", code_question_2, run_question_2)
-                  ).pack(pady=5)
-        elif i == 3:
-            # Bouton pour la version avec tous les matchs
-            tk.Button(root,
-                    text="Question 3 - Tous matchs",
-                    font=("Helvetica", 13),
-                    width=30,
-                    command=lambda: open_question_window("Question 3 - Tous matchs", code_q10_part1, run_question_3_part1)
-                    ).pack(pady=3)
+    # === Boutons des questions ===
+    tk.Button(root, text="Question 1", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 1", run_question_1, code_question_1)).pack(pady=5)
 
-            # Bouton pour la version filtrée (NBA uniquement)
-            tk.Button(root,
-                    text="Question 3 - NBA (≥30 matchs)",
-                    font=("Helvetica", 13),
-                    width=30,
-                    command=lambda: open_question_window("Question 3 - NBA", code_q10_part2, run_question_3_part2)
-                    ).pack(pady=3)
+    tk.Button(root, text="Question 2", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 2", run_question_2, code_question_2)).pack(pady=5)
 
+    tk.Button(root, text="Question 3 - Tous matchs", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 3 - Tous matchs", run_question_3_part1, code_q10_part1)).pack(pady=3)
 
-        elif i == 9:
-            tk.Button(root,
-                  text=f"Question {i}",
-                  font=("Helvetica", 13),
-                  width=30,
-                  command=lambda: open_question_window("Question 9", code_question_9, run_question_9)
-                  ).pack(pady=5)
-            
-        elif i == 10:
-            tk.Button(root,
-                 text="Question 10 - Python pur",
-                 font=("Helvetica", 13),
-                 width=30,
-                 command=lambda: open_question_window("Question 10 - Python pur", code_q10_pure, run_question_10_pure)
-                 ).pack(pady=3)
+    tk.Button(root, text="Question 3 - NBA (≥30 matchs)", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 3 - NBA", run_question_3_part2, code_q10_part2)).pack(pady=3)
 
-            tk.Button(root,
-                 text="Question 10 - Pandas",
-                 font=("Helvetica", 13),
-                 width=30,
-                 command=lambda: open_question_window("Question 10 - Pandas", code_q10_pandas, run_question_10_pandas)
-                 ).pack(pady=3)
+    tk.Button(root, text="Question 4", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 4", run_question_4, code_q4, besoin_annee=True)).pack(pady=5)
 
-        else:
-            tk.Button(root,
-                  text=f"Question {i} (à compléter)",
-                  font=("Helvetica", 13),
-                  width=30,
-                  state="disabled"
-                  ).pack(pady=5)
+    tk.Button(root, text="Question 5", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 5", run_question_5, code_question_5, besoin_annee=True)).pack(pady=5)
+
+    tk.Button(root, text="Question 7", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 7", run_question_7, code_question_7)).pack(pady=5)
+
+    tk.Button(root, text="Question 8", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 8", run_question_8, code_question_8)).pack(pady=5)
+
+    tk.Button(root, text="Question 9", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 9", run_question_9, code_question_9)).pack(pady=5)
+
+    tk.Button(root, text="Question 10 - Python pur", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 10 - Python pur", run_question_10_pure, code_q10_pure)).pack(pady=3)
+
+    tk.Button(root, text="Question 10 - Pandas", font=("Helvetica", 13), width=30,
+              command=lambda: open_window("Question 10 - Pandas", run_question_10_pandas, code_q10_pandas)).pack(pady=3)
 
     root.mainloop()
+
+
 
 # === LANCEMENT ===
 main_menu()
