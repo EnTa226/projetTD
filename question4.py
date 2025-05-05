@@ -73,12 +73,15 @@ else:
 
     # Fonction pour obtenir le nom complet de l'équipe à partir de son abréviation
     def get_full_name(abbreviation):
-        return team_dict.get(abbreviation, "Équipe non trouvée")
+        return team_dict.get(abbreviation)
 
     # Afficher l'abréviation de l'équipe avec le plus de réussite aux trois points
     top_team_abbreviation = reussite_3_df_sorted.iloc[0]['team_abbreviation']
-    print(top_team_abbreviation)
-   
-
-    print(f"L'équipe avec le plus de réussite aux trois points sont les {get_full_name(top_team_abbreviation)} "
-          f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}.")
+    
+    if top_team_abbreviation in team_dict:
+        print(f"L'équipe avec le plus de réussite aux trois points pour la saison {year} sont les {get_full_name(top_team_abbreviation)} "
+              f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}.")
+    else:
+        print(f"L'abbréviation de l'équipe avec le meilleur taux de réussite aux 3 points pour la saison {year} est {top_team_abbreviation} "
+          f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}."
+          f" Cette équipe n'existe plus.")
