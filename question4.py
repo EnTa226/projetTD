@@ -51,7 +51,8 @@ else:
     team_csv = pd.read_csv('team.csv')
 
     # Créer un dictionnaire pour mapper les abréviations aux noms complets
-    team_dict = team_csv.set_index('abbreviation')['full_name'].to_dict()
+    team_dict = game.set_index(
+        'team_abbreviation_home')['team_name_home'].to_dict()
 
     # Obtenir le nom complet de l'équipe à partir de son abréviation
     def get_full_name(abbreviation):
@@ -60,19 +61,10 @@ else:
     # Afficher l'équipe avec le plus de réussite aux trois points
     top_team_abbreviation = reussite_3_df_sorted.iloc[0]['team_abbreviation']
 
-    if top_team_abbreviation in team_dict:
-        print(
-            (f"L'équipe avec le plus de réussite aux "
-             f"trois points pour la saison {year} "
-             f"sont les {get_full_name(top_team_abbreviation)} "
-             f"avec un ratio de "
-             f"{round(reussite_3_df_sorted.iloc[0]['reussite_3'], 3)}.")
-        )
-    else:
-        print(
-            f"L'équipe avec le meilleur taux de réussite "
-            f"aux 3 points pour la saison {year} est {top_team_abbreviation} "
-            f"avec un ratio de "
-            f"{round(reussite_3_df_sorted.iloc[0]['reussite_3'], 3)}. "
-            f"Cette équipe n'existe plus."
+    print(
+        (f"L'équipe avec le plus de réussite aux "
+         f"trois points pour la saison {year} "
+         f"sont les {get_full_name(top_team_abbreviation)} "
+         f"avec un ratio de "
+         f"{round(reussite_3_df_sorted.iloc[0]['reussite_3'], 3)}.")
         )
