@@ -4,16 +4,10 @@ import pandas as pd
 game = pd.read_csv('game.csv', sep=',')
 game = game.dropna(subset=['fg3_pct_home', 'fg3_pct_away'])
 
-# Compter le nombre de matchs pour chaque équipe à domicile
-home_counts = game['team_abbreviation_home'].value_counts()
-
-# Compter le nombre de matchs pour chaque équipe à l'extérieur
-away_counts = game['team_abbreviation_away'].value_counts()
-
-# Additionner les comptages pour obtenir le nombre total de matchs pour chaque équipe
-total_counts = home_counts.add(away_counts, fill_value=0)
-
-game = game[game['team_abbreviation_home'].isin(total_counts[total_counts > 40].index)]
+# Filtrer les données pour ne pas avoir en sorti une équipe qui
+# n'est pas une équipe NBA (ex: All-Star, Moscow CSKA, etc.)
+game = game[(game['season_type'] == 'Regular Season')
+            | (game['season_type'] == 'Playoffs')]
 
 # Convertir la colonne season_id en chaîne de caractères
 game['season_id'] = game['season_id'].astype(str)
@@ -21,7 +15,7 @@ game['season_id'] = game['season_id'].astype(str)
 # Déterminer l'année qui nous intéresse
 year = input("Entrez l'année de la saison à partir de 1986 (ex: 2005) : ")
 
-if not year.isdigit() or int(year) < 1986 or int(year) > 2023:
+if not year.isdigit() or int(year) < 1986 or int(year) >= 2023:
     print(f"Aucune donnée trouvée pour la saison {year}.")
 else:
     game_year = game[game["season_id"].str.contains(year)]
@@ -34,25 +28,13 @@ else:
     away_counts = game_year['team_abbreviation_away'].value_counts()
 
     # Total des matchs joués par équipe
-    total_counts = home_counts.add(away_counts, fill_value=0)
-
-    # Filtrer uniquement les équipes avec au moins 10 matchs
-    valid_teams = total_counts[total_counts >= 10].index
-
-    # Garder uniquement les lignes du DataFrame où au moins une des deux équipes est valide
-    game_year = game_year[
-        game_year['team_abbreviation_home'].isin(valid_teams) &
-        game_year['team_abbreviation_away'].isin(valid_teams)
-    ]
-
-    # Recalculer les comptes après filtrage
-    home_counts = game_year['team_abbreviation_home'].value_counts()
-    away_counts = game_year['team_abbreviation_away'].value_counts()
-    total_counts = home_counts.add(away_counts, fill_value=0)
+    total_counts = home_counts + away_counts
 
     # Calculer les pourcentages de réussite
-    home_fg3_pct = game_year.groupby('team_abbreviation_home')['fg3_pct_home'].sum()
-    away_fg3_pct = game_year.groupby('team_abbreviation_away')['fg3_pct_away'].sum()
+    home_fg3_pct = game_year.groupby('team_abbreviation_home'
+                                     )['fg3_pct_home'].sum()
+    away_fg3_pct = game_year.groupby('team_abbreviation_away'
+                                     )['fg3_pct_away'].sum()
     total_fg3_pct = home_fg3_pct.add(away_fg3_pct, fill_value=0)
 
     # Moyenne des % de réussite à 3 points
@@ -61,8 +43,9 @@ else:
     # Mise en forme du DataFrame
     reussite_3_df = reussite_3.reset_index()
     reussite_3_df.columns = ['team_abbreviation', 'reussite_3']
-    reussite_3_df_sorted = reussite_3_df.sort_values(by='reussite_3', ascending=False).reset_index(drop=True)
-
+    reussite_3_df_sorted = reussite_3_df.sort_values(
+        by='reussite_3', ascending=False
+    ).reset_index(drop=True)
 
     # Charger les données à partir du fichier CSV
     team_csv = pd.read_csv('team.csv')
@@ -70,18 +53,26 @@ else:
     # Créer un dictionnaire pour mapper les abréviations aux noms complets
     team_dict = team_csv.set_index('abbreviation')['full_name'].to_dict()
 
-
-    # Fonction pour obtenir le nom complet de l'équipe à partir de son abréviation
+    # Obtenir le nom complet de l'équipe à partir de son abréviation
     def get_full_name(abbreviation):
         return team_dict.get(abbreviation)
 
-    # Afficher l'abréviation de l'équipe avec le plus de réussite aux trois points
+    # Afficher l'équipe avec le plus de réussite aux trois points
     top_team_abbreviation = reussite_3_df_sorted.iloc[0]['team_abbreviation']
-    
+
     if top_team_abbreviation in team_dict:
-        print(f"L'équipe avec le plus de réussite aux trois points pour la saison {year} sont les {get_full_name(top_team_abbreviation)} "
-              f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}.")
+        print(
+            (f"L'équipe avec le plus de réussite aux "
+             f"trois points pour la saison {year} "
+             f"sont les {get_full_name(top_team_abbreviation)} "
+             f"avec un ratio de "
+             f"{round(reussite_3_df_sorted.iloc[0]['reussite_3'], 3)}.")
+        )
     else:
-        print(f"L'abbréviation de l'équipe avec le meilleur taux de réussite aux 3 points pour la saison {year} est {top_team_abbreviation} "
-          f"avec un pourcentage de {reussite_3_df_sorted.iloc[0]['reussite_3']:.2f}."
-          f" Cette équipe n'existe plus.")
+        print(
+            f"L'équipe avec le meilleur taux de réussite "
+            f"aux 3 points pour la saison {year} est {top_team_abbreviation} "
+            f"avec un ratio de "
+            f"{round(reussite_3_df_sorted.iloc[0]['reussite_3'], 3)}. "
+            f"Cette équipe n'existe plus."
+        )
