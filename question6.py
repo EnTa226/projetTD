@@ -1,11 +1,13 @@
 import pandas as pd
 
+
 def convert_height_to_cm(height_str):
     try:
         feet, inches = map(int, height_str.split("-"))
         return round(feet * 30.48 + inches * 2.54, 2)
     except (ValueError, AttributeError):
         return None
+
 
 df = pd.read_csv("common_player_info.csv")
 
