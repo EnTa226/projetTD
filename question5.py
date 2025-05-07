@@ -6,7 +6,7 @@ import pandas as pd
 df = pd.read_csv('common_player_info.csv')
 
 # On garde que les joueurs qui n'ont pas Ã©tÃ© draftÃ©s
-# On remarque que la colonne 'draft_year' contient l'annÃ©e de draft ou 'Undrafted'
+# On remarque que la colonne 'draft_year' contient l'année de draft ou 'Undrafted'
 undrafted_players = df[df['draft_year'] == 'Undrafted']
 
 # On compte le nombre de joueurs "Undrafted" par Ã©quipe ( colone team_name)

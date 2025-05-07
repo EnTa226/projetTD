@@ -3,7 +3,7 @@ import pandas as pd
 # Charger le fichier CSV
 df = pd.read_csv("common_player_info.csv")
 
-# Convertir la colonne 'jersey' en chaîne de caractères pour utiliser str.isnumeric()
+# Convertir la colonne 'jersey' en chaîne de caractères
 df['jersey'] = df['jersey'].astype(str)
 
 # Filtrer uniquement les valeurs non nulles et numériques

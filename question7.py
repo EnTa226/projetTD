@@ -1,13 +1,14 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Fonction de conversion de la taille en cm
+
 def convert_height_to_cm(height_str):
     try:
         feet, inches = map(int, height_str.split("-"))
         return round(feet * 30.48 + inches * 2.54, 2)
-    except:
+    except (ValueError, AttributeError):
         return None
+
 
 # Chargement des données
 df = pd.read_csv("common_player_info.csv")
@@ -29,5 +30,6 @@ plt.xticks(rotation=45)
 plt.grid(True)
 plt.tight_layout()
 
-# Affichage
+
+# Display the plot
 plt.show()

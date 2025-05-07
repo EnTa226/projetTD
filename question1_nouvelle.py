@@ -15,7 +15,8 @@ for _, row in playoffs_df.iterrows():
 champions = []
 for season_id, matches in seasons.items():
     # Trier les matchs par date
-    matches.sort(key=lambda x: datetime.strptime(x["game_date"], "%Y-%m-%d %H:%M:%S"))
+    matches.sort(key=lambda x: datetime.strptime(x["game_date"],
+                                                 "%Y-%m-%d %H:%M:%S"))
     last_game = matches[-1]
 
     # Déterminer le gagnant du dernier match
