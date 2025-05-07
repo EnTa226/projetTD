@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 
 # Charger le DataFrame
 draft = pd.read_csv('draft_history.csv')
-draft = draft[draft['season'] >= 1984]  # Filtrer les saisons à partir de 1984
 draft = draft.dropna(subset=['organization'])
 
 # Compter le nombre de joueurs draftés par an

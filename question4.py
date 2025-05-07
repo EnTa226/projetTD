@@ -47,9 +47,6 @@ else:
         by='reussite_3', ascending=False
     ).reset_index(drop=True)
 
-    # Charger les données à partir du fichier CSV
-    team_csv = pd.read_csv('team.csv')
-
     # Créer un dictionnaire pour mapper les abréviations aux noms complets
     team_dict = game.set_index(
         'team_abbreviation_home')['team_name_home'].to_dict()
