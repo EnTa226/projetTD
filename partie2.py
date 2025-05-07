@@ -5,7 +5,6 @@
 
 # Importation des bibliothèques nécessaires
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
@@ -76,10 +75,12 @@ plt.close()
 palette = {0: 'b', 1: 'g', 2: 'y', 3: 'r'}
 
 
-cluster_data = [] # Prépare les données par cluster
+cluster_data = []  # Prépare les données par cluster
 for cluster in sorted(df['Cluster'].unique()):
-    teams = df[df['Cluster'] == cluster].sort_values(by='Win Ratio', ascending=False)
-    team_strs = [f"{row['abbreviation']} ({row['Win Ratio']:.3f})" for _, row in teams.iterrows()]
+    teams = df[df['Cluster'] == cluster].sort_values(
+        by='Win Ratio', ascending=False)
+    team_strs = [f"{row['abbreviation']} ({row['Win Ratio']:.3f})"
+                 for _, row in teams.iterrows()]
     cluster_data.append(team_strs)
 
 max_len = max(len(col) for col in cluster_data)
@@ -88,7 +89,7 @@ for col in cluster_data:
         col.append("")
 
 # Création du tableau
-table_data = list(zip(*cluster_data))  # Transpose pour avoir les équipes en lignes
+table_data = list(zip(*cluster_data))  # transpose les équipes en lignes
 column_labels = [f"Cluster {c}" for c in sorted(df['Cluster'].unique())]
 col_colors = [palette[c] for c in sorted(df['Cluster'].unique())]
 
