@@ -3,8 +3,8 @@
 import pandas as pd
 
 # Charger le fichier CSV
-file_path = "/mnt/data/game.csv"
-df = pd.read_csv(file_path)
+fichier = "game.csv"
+df = pd.read_csv(fichier)
 
 # Afficher les premières lignes pour comprendre la structure des données
 df.head()
@@ -80,13 +80,22 @@ print(best_team, best_ratio)
 # On remarque que la meilleure équipe trouvé est le Barcelone FC, qui n'est pas une
 # équipe de la NBA. Il s'agissait d'un match d'exibition. Ainsi on rajoute une
 # condition pour ne pas prendre en compte les matchs d'exibition. On considère qu'une
-#  équipe doit ainsi apparaitre dans plus de 30 matchs de la base de donné.
+# équipe doit ainsi apparaitre dans plus de 30 matchs de la base de donné.
 
+
+# Calculer les ratios de victoire
+win_ratios = {team: win_counts[team] / game_counts[team] for team in win_counts if game_counts[team] > 30}
+
+# Trouver l'équipe avec le meilleur ratio
+best_team = max(win_ratios, key=win_ratios.get)
+best_ratio = win_ratios[best_team]
+
+print(best_team, best_ratio)
+
+# L'équipe avec le meilleur ratio de victoire est les Lakers de Los Angeles
 
 
 ########## Dans un deuxième temps avec python en pure:
-
-
 
 
 
@@ -134,7 +143,7 @@ with open("game.csv", "r", encoding="utf-8") as file:
             win_counts[team_away] += 1
 
 # Calculer les ratios de victoire
-win_ratios = {team: win_counts[team] / game_counts[team] for team in win_counts if game_counts[team] >= 30}
+win_ratios = {team: win_counts[team] / game_counts[team] for team in win_counts if game_counts[team] >= 30} # On ne prend en compte que les équipes ayant joué plus de 30 matchs
 
 # Trouver l'équipe avec le meilleur ratio
 best_team = max(win_ratios, key=win_ratios.get)
@@ -143,5 +152,4 @@ best_ratio = win_ratios[best_team]
 print(best_team, best_ratio)
 
 
-# L'équipe de NBA avec le meilleur 
-# ratio de victoire est les Los Angeles Lakers avec un ratio de 0.60
+# L'équipe avec le meilleur ratio de victoire est les Lakers de Los Angeles
