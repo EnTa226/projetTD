@@ -481,6 +481,7 @@ plt.tight_layout()
 plt.show()
 '''
 
+
 def run_question_8():
     import pandas as pd
     import matplotlib.pyplot as plt
