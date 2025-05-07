@@ -71,41 +71,40 @@ print(df)
 # On cherche à visualiser les clusters
 plt.close()
 
-# Configuration
-plt.figure(figsize=(16, 8))
-ax = plt.gca()
-
+plt.close()
+# Palette de couleurs pour les clusters
 palette = {0: 'b', 1: 'g', 2: 'y', 3: 'r'}
 
-for cluster in df['Cluster'].unique():
-    subset = df[df['Cluster'] == cluster]
-    plt.scatter(subset['Win Ratio'], [1]*len(subset),
-                c=palette[cluster], s=100,
-                label=f'Cluster {cluster}', alpha=0.8)
 
-plt.xticks(np.arange(0.15, 0.75, 0.05), fontsize=10)
-plt.xlim(0.15, 0.75)  # comprends toutes les valeurs des ratios de win
+cluster_data = [] # Prépare les données par cluster
+for cluster in sorted(df['Cluster'].unique()):
+    teams = df[df['Cluster'] == cluster].sort_values(by='Win Ratio', ascending=False)
+    team_strs = [f"{row['abbreviation']} ({row['Win Ratio']:.3f})" for _, row in teams.iterrows()]
+    cluster_data.append(team_strs)
 
-for _, row in df.iterrows():
-    plt.text(row['Win Ratio'], 1.015, row['abbreviation'],
-             ha='center', va='bottom', fontsize=10, fontweight='bold')
+max_len = max(len(col) for col in cluster_data)
+for col in cluster_data:
+    while len(col) < max_len:
+        col.append("")
 
-    plt.text(row['Win Ratio'], 0.985, f"{row['Win Ratio']:.3f}",
-             ha='center', va='top', fontsize=8, color='gray')
+# Création du tableau
+table_data = list(zip(*cluster_data))  # Transpose pour avoir les équipes en lignes
+column_labels = [f"Cluster {c}" for c in sorted(df['Cluster'].unique())]
+col_colors = [palette[c] for c in sorted(df['Cluster'].unique())]
 
-# Titre et labels
-plt.title('Classement des équipes par ratio de victoire avec clustering',
-          pad=20, fontsize=14)
-plt.xlabel('Win Ratio', fontsize=12)
-plt.yticks([])  # Masque l'axe Y
-plt.grid(axis='x', linestyle='--', alpha=0.4)
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.axis('off')
 
-# Légende
-legend = plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12),
-                    ncol=4, frameon=False, fontsize=11)
-for handle in legend.legend_handles:
-    handle.set_sizes([60])
+table = ax.table(cellText=table_data,
+                 colLabels=column_labels,
+                 colColours=col_colors,
+                 loc='center',
+                 cellLoc='center')
 
+table.auto_set_font_size(False)
+table.set_fontsize(11)
+table.scale(1.2, 1.5)
 
+plt.title('Équipes regroupées par cluster (Win Ratio)', fontsize=14, pad=20)
 plt.tight_layout()
 plt.show()
