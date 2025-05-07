@@ -3,24 +3,16 @@ import numpy as np
 
 # Charger les données
 game = pd.read_csv('game.csv')
-game["game_date"] = pd.to_datetime(game["game_date"])
-print(game.head())
 
-# Filtrer les données pour la saison régulière 2022-2023
-debut_saison_22_23 = pd.Timestamp(2022, 10, 18)
-fin_saison_22_23 = pd.Timestamp(2023, 4, 12)
-
-game_reg_season_22_23 = game[(game['game_date'] >= debut_saison_22_23)
-                             & (game['game_date'] <= fin_saison_22_23)
+game_reg_season_22_23 = game[(game["season_id"] == 22022)
                              & (game["season_type"] == "Regular Season")]
-print(game_reg_season_22_23)
+
 
 # Ajouter une colonne pour le vainqueur
 game_reg_season_22_23["winner"] = np.where(
     game_reg_season_22_23["wl_home"] == "W",
     game_reg_season_22_23["team_abbreviation_home"],
     game_reg_season_22_23["team_abbreviation_away"])
-print(game_reg_season_22_23.head())
 
 # Calculer le ratio de victoires
 total_games = (game_reg_season_22_23['team_abbreviation_home'].value_counts() +
@@ -69,5 +61,5 @@ print(classement_west.to_string(index=False))
 classement_east = ratio_df[ratio_df['conf'] == 'E'].copy()
 classement_east['classement'] = classement_east['Win Ratio'].rank(
     ascending=False, method='first').astype(int)
-print("\nClassement Conférence Est:")
+print("Classement Conférence Est:")
 print(classement_east.to_string(index=False))
