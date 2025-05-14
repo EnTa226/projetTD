@@ -1495,7 +1495,7 @@ def main_menu():
     root.title("Hub d'analyse NBA 🏀")
     root.geometry("600x700")
 
-    tk.Label(root, text="Ici ça répond",
+    tk.Label(root, text="🏀⭐Menu⭐🏀",
              font=("Helvetica", 22, "bold")).pack(pady=20)
     tk.Label(root, text="Choisis une question à explorer :",
              font=("Helvetica", 14)).pack(pady=10)
