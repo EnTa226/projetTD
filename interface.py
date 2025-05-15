@@ -792,27 +792,37 @@ def run_question_4(annee):
 
 
 code_question_5 = '''
-# Quelle est l'équipe ayant eu le plus de joueurs qui ne sont pas
-# arrivé en NBA par la draft ?
-
 import pandas as pd
+    annee = input("Entrez l'année de la saison : ")
+    # Charger les données
+    df = pd.read_csv('common_player_info.csv')
 
-# On charge le fichier CSV
-df = pd.read_csv('common_player_info.csv')
+    # Vérification de l'année en tant qu'entier
+    try:
+        annee = int(annee)
+    except ValueError:
+        return f"Année invalide : {annee}"
 
-# On garde que les joueurs qui n'ont pas été draftés
-# On remarque que la colonne 'draft_year' contient l'année
-# de draft ou 'Undrafted'
-undrafted_players = df[df['draft_year'] == 'Undrafted']
+    # Garder les joueurs non draftés
+    undrafted_players = df[df['draft_year'] == 'Undrafted']
 
-# On compte le nombre de joueurs "Undrafted" par équipe ( colone team_name)
+    # Filtrer par année (dans 'from_year' et 'to_year')
+    actifs_cette_annee = undrafted_players[
+        (undrafted_players['from_year'] <= annee)
+        & (undrafted_players['to_year'] >= annee)
+    ]
 
-undrafted_counts = undrafted_players['team_name'].value_counts()
+    if actifs_cette_annee.empty:
+        return f"Aucun joueur non drafté n'était actif en {annee}."
 
-# Afficher les résultats
-print(undrafted_counts[0:1])
+    # Compter les joueurs non draftés par équipe
+    undrafted_counts = actifs_cette_annee['team_name'].value_counts()
 
-# Il s'agit donc de l'équipe des Hawks
+    top_team = undrafted_counts.idxmax()
+    top_count = undrafted_counts.max()
+
+    return (f"En {annee}, l'équipe ayant eu le plus de joueurs non draftés "
+            f"était les {top_team} avec {top_count} joueur(s) non drafté(s).")
 '''
 
 
